@@ -9,3 +9,5 @@
 - `src/types`: contrato Supabase e domínio.
 
 O servidor autoriza com `getClaims()`. O RLS existente determina o escopo de organização; nenhuma organização vem do cliente.
+
+Os serviços iniciais são `organizations`, `units`, `modalities` e `students`. O serviço de alunos usa `current_user_organization_id()` para obter contexto de consulta/criação, mas cada operação continua protegida pelo RLS do banco.

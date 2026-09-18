@@ -4,6 +4,14 @@ O projeto Supabase **SLT Enterprise Clean** (`klsyqysdkwsuwmmglmfa`) é a única
 
 Tabelas confirmadas: `organizations`, `units`, `modalities`, `students`, `student_modality_units`, `trainings`, `training_exercises`, `attendance`, `evaluations`, `evaluation_results`, `users`, `plans`, `student_plans`, `charges`, `payments`.
 
-## Pendência antes de CRUD
+## Tipos gerados
 
-Gerar tipos do schema conectado e substituir `src/types/supabase.ts`. Não foram confirmados nomes de colunas, restrições, enums ou campo de histórico de acesso; o código não os infere. IDs bigint são strings na borda TypeScript/PostgREST; `users` usa UUID.
+`src/types/supabase.ts` foi gerado diretamente do schema `public` pela Supabase CLI em 18/09/2026. Ele contém colunas, nullability, relações e a função `current_user_organization_id()` exatamente como retornados pelo projeto.
+
+Para atualizar o contrato após uma mudança de schema autorizada, execute localmente:
+
+```powershell
+npx supabase@latest gen types typescript --project-id klsyqysdkwsuwmmglmfa --schema public
+```
+
+IDs `bigint` são representados pela geração oficial como `number`; o ID de `users` é UUID.

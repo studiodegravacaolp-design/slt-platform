@@ -1,5 +1,5 @@
-/** bigint domain IDs cross the API boundary as strings to avoid precision loss. */
-export type DomainId = string
+/** Supabase generated types map the canonical bigint IDs to JavaScript numbers. */
+export type DomainId = number
 export type UserId = string
 
 export type Intensity = 'leve' | 'moderada' | 'alta'
