@@ -1,2 +1,2 @@
-import { PageHeader } from '@/components/page-header'
-export default function TrainingsPage() { return <><PageHeader title="Treinamentos" description="Planeje exercícios, descanso, duração e intensidade." /><section className="panel"><p>Base de validação pronta para treinamentos e exercícios.</p></section></> }
+import Link from 'next/link'; import { PageHeader } from '@/components/page-header'; import { listStudents } from '@/services/students'
+export default async function TrainingsPage(){const students=await listStudents();return <><PageHeader title="Treinamentos" description="Selecione um aluno para visualizar seus treinamentos."/><section className="panel">{students.length?<ul>{students.map(s=><li key={s.id}><Link href={`/students/${s.id}`}>{s.full_name}</Link></li>)}</ul>:<p>Nenhum aluno disponível.</p>}</section></>}
