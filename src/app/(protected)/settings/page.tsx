@@ -1,3 +1,3 @@
-import { PageHeader } from '@/components/page-header'
-const sections = ['Organização', 'Unidade', 'Modalidades', 'Meu perfil', 'Segurança', 'Plano']
-export default function SettingsPage() { return <><PageHeader title="Configurações" description="Gerencie o ambiente da organização." /><section className="settings">{sections.map((section) => <article className="panel" key={section}><h2>{section}</h2></article>)}</section></> }
+import Link from 'next/link'; import { PageHeader } from '@/components/page-header'
+const sections = [{ label: 'Organização', href: '/settings/organization' }, { label: 'Unidade', href: '/settings/units' }, { label: 'Modalidades', href: '/settings/modalities' }, { label: 'Meu perfil' }, { label: 'Segurança' }, { label: 'Plano' }]
+export default function SettingsPage() { return <><PageHeader title="Configurações" description="Gerencie o ambiente da organização." /><section className="settings">{sections.map((section) => <article className="panel" key={section.label}>{section.href ? <Link href={section.href}><h2>{section.label}</h2></Link> : <h2>{section.label}</h2>}</article>)}</section></> }

@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import type { Tables } from '@/types/supabase'
+import { organizationUpdateSchema, type OrganizationUpdateInput } from '@/validations/settings'
 
 export type Organization = Tables<'organizations'>
 
@@ -18,3 +19,4 @@ export async function getCurrentOrganization(): Promise<Organization> {
   if (error) throw new Error('Não foi possível carregar a organização atual.')
   return data
 }
+export async function updateCurrentOrganization(input: OrganizationUpdateInput): Promise<Organization> { const supabase = await createClient(); const id = await getCurrentOrganizationId(); const { data, error } = await supabase.from('organizations').update(organizationUpdateSchema.parse(input)).eq('id', id).select().single(); if (error) throw new Error('Não foi possível atualizar a organização.'); return data }
