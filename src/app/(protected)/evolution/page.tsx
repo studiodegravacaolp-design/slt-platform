@@ -1,2 +1,5 @@
+import Link from 'next/link'
 import { PageHeader } from '@/components/page-header'
-export default function EvolutionPage() { return <><PageHeader title="Evolução" description="Avaliações e resultados do aluno." /><section className="panel"><p>Este módulo usará <code>evaluations</code> e <code>evaluation_results</code>.</p></section></> }
+import { listEvaluations } from '@/services/evaluations'
+import { listStudents } from '@/services/students'
+export default async function EvolutionPage(){const [evaluations,students]=await Promise.all([listEvaluations(),listStudents()]);const names=new Map(students.map(s=>[s.id,s.full_name]));return <><PageHeader title="Evolução" description="Avaliações e resultados dos alunos." action={<Link className="button" href="/evolution/new">+ Nova avaliação</Link>}/><section className="panel">{evaluations.length?<div className="student-list">{evaluations.map(e=><Link className="student-row" href={`/evolution/${e.id}`} key={e.id}><div><strong>{names.get(e.student_id)||`Aluno #${e.student_id}`}</strong><span>{e.type} · {new Date(`${e.date}T00:00:00`).toLocaleDateString('pt-BR')}</span></div></Link>)}</div>:<div className="empty-state"><h2>Nenhuma avaliação cadastrada</h2><p>Registre a primeira avaliação para acompanhar a evolução.</p></div>}</section></>}
