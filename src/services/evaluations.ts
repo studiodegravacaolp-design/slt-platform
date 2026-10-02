@@ -2,20 +2,11 @@ import { createClient } from '@/lib/supabase/server'
 import type { Tables, TablesInsert } from '@/types/supabase'
 import { evaluationCreateSchema, evaluationResultCreateSchema, evaluationResultUpdateSchema, evaluationUpdateSchema, type EvaluationCreateInput, type EvaluationResultCreateInput, type EvaluationResultUpdateInput, type EvaluationUpdateInput } from '@/validations/evaluation'
 import { getCurrentOrganizationId } from './organizations'
+import { getCurrentUserContext } from './users'
 
 export type Evaluation = Tables<'evaluations'>
 export type EvaluationResult = Tables<'evaluation_results'>
 export type ListEvaluationsOptions = { studentId?: number; unitId?: number; modalityId?: number; date?: string }
-
-async function currentResponsibleUserId(organizationId: number) {
-  const supabase = await createClient()
-  const { data: claimsData, error: claimsError } = await supabase.auth.getClaims()
-  const authUserId = claimsData?.claims.sub
-  if (claimsError || typeof authUserId !== 'string') throw new Error('Usuário autenticado não encontrado.')
-  const { data: user, error } = await supabase.from('users').select('id').eq('id', authUserId).eq('organization_id', organizationId).single()
-  if (error || !user) throw new Error('Usuário responsável não encontrado na organização.')
-  return user.id
-}
 
 async function assertStudentSportContext(organizationId: number, input: Pick<EvaluationCreateInput, 'student_id' | 'unit_id' | 'modality_id'>) {
   const supabase = await createClient()
@@ -42,7 +33,7 @@ export async function listEvaluations(options: ListEvaluationsOptions = {}): Pro
 export async function listEvaluationsByStudent(studentId: number) { return listEvaluations({ studentId }) }
 export async function getEvaluation(id: number): Promise<Evaluation> { const s = await createClient(); const { data, error } = await s.from('evaluations').select('*').eq('id', id).single(); if (error) throw new Error('Avaliação não encontrada.'); return data }
 export async function createEvaluation(input: EvaluationCreateInput): Promise<Evaluation> {
-  const payload = evaluationCreateSchema.parse(input); const organizationId = await getCurrentOrganizationId(); await assertStudentSportContext(organizationId, payload); const responsible_user_id = await currentResponsibleUserId(organizationId); const s = await createClient()
+  const payload = evaluationCreateSchema.parse(input); const organizationId = await getCurrentOrganizationId(); await assertStudentSportContext(organizationId, payload); const { id: responsible_user_id } = await getCurrentUserContext(); const s = await createClient()
   const insert: TablesInsert<'evaluations'> = { ...payload, organization_id: organizationId, responsible_user_id }
   const { data, error } = await s.from('evaluations').insert(insert).select().single(); if (error) throw new Error('Não foi possível criar a avaliação.'); return data
 }
