@@ -1,3 +1,15 @@
-import Link from 'next/link'; import { PageHeader } from '@/components/page-header'
-const sections = [{ label: 'Organização', href: '/settings/organization' }, { label: 'Unidade', href: '/settings/units' }, { label: 'Modalidades', href: '/settings/modalities' }, { label: 'Meu perfil', href: '/settings/profile' }, { label: 'Segurança', href: '/settings/security' }, { label: 'Plano' }]
-export default function SettingsPage() { return <><PageHeader title="Configurações" description="Gerencie o ambiente da organização." /><section className="settings">{sections.map((section) => <article className="panel" key={section.label}>{section.href ? <Link href={section.href}><h2>{section.label}</h2></Link> : <h2>{section.label}</h2>}</article>)}</section></> }
+import Link from 'next/link'
+import { PageHeader } from '@/components/page-header'
+
+const sections = [
+  { label: 'Organização', href: '/settings/organization' },
+  { label: 'Unidade', href: '/settings/units' },
+  { label: 'Modalidades', href: '/settings/modalities' },
+  { label: 'Meu perfil', href: '/settings/profile' },
+  { label: 'Segurança', href: '/settings/security' },
+  { label: 'Plano', description: 'Indisponível nesta versão.' },
+]
+
+export default function SettingsPage() {
+  return <><PageHeader title="Configurações" description="Gerencie o ambiente da organização." /><section className="settings">{sections.map((section) => <article className="panel" key={section.label}>{section.href ? <Link href={section.href}><h2>{section.label}</h2></Link> : <><h2>{section.label}</h2><p className="muted-note">{section.description}</p></>}</article>)}</section></>
+}

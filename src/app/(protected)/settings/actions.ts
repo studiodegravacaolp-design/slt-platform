@@ -10,6 +10,7 @@ import { modalitySchema, organizationUpdateSchema, type ModalityInput, type Orga
 const organizationValues = (formData: FormData) => Object.fromEntries([...formData].map(([key, value]) => [key, value === '' ? null : value]))
 const unitValues = (formData: FormData) => Object.fromEntries(['name', 'code', 'email', 'phone', 'cep', 'state', 'city', 'neighborhood', 'street', 'number', 'complement'].map((key) => [key, formData.get(key) === '' ? null : formData.get(key)]))
 const modalityValues = (formData: FormData) => Object.fromEntries(['name', 'description', 'unit_id'].map((key) => [key, formData.get(key) === '' ? null : formData.get(key)]))
+const modalityUpdateSchema = modalitySchema.pick({ name: true, description: true })
 
 export async function saveOrganization(formData: FormData) {
   let input: OrganizationUpdateInput
@@ -37,21 +38,24 @@ export async function makeUnitMain(id: number) {
 
 export async function saveModality(id: number | undefined, formData: FormData) {
   const destination = id ? `/settings/modalities/${id}` : '/settings/modalities'
-  let input: ModalityInput
-  try { input = modalitySchema.parse(modalityValues(formData)) } catch { redirect(`${destination}?error=validation`) }
-  try {
-    if (id) {
+  if (id) {
+    let input: Pick<ModalityInput, 'name' | 'description'>
+    try { input = modalityUpdateSchema.parse(modalityValues(formData)) } catch { redirect(`${destination}?error=validation`) }
+    try {
       const current = await getModality(id)
       await updateModality(id, { name: input.name, description: input.description, status: current.status })
-    } else {
-      await getUnit(input.unit_id)
-      await createModality(input)
-    }
-  } catch (error) {
-    if (!id && error instanceof Error && error.message === 'Unidade não encontrada.') redirect(`${destination}?error=unit`)
+    } catch { redirect(`${destination}?error=update`) }
+    revalidatePath('/settings/modalities')
+    revalidatePath(`/settings/modalities/${id}`)
+    redirect(`/settings/modalities/${id}?updated=1`)
+  }
+
+  let input: ModalityInput
+  try { input = modalitySchema.parse(modalityValues(formData)) } catch { redirect(`${destination}?error=validation`) }
+  try { await getUnit(input.unit_id); await createModality(input) } catch (error) {
+    if (error instanceof Error && error.message === 'Unidade não encontrada.') redirect(`${destination}?error=unit`)
     redirect(`${destination}?error=update`)
   }
   revalidatePath('/settings/modalities')
-  if (id) { revalidatePath(`/settings/modalities/${id}`); redirect(`/settings/modalities/${id}?updated=1`) }
   redirect('/settings/modalities?created=1')
 }
