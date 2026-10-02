@@ -1,14 +1,16 @@
 import { NextResponse, type NextRequest } from 'next/server'
+import { getRecoveryCallbackPayload } from '@/lib/auth/recovery-callback'
 import { createClient } from '@/lib/supabase/server'
 
 export async function GET(request: NextRequest) {
   const requestUrl = new URL(request.url)
-  const tokenHash = requestUrl.searchParams.get('token_hash')
-  const type = requestUrl.searchParams.get('type')
+  const payload = getRecoveryCallbackPayload(requestUrl.searchParams)
 
-  if (tokenHash && type === 'recovery') {
+  if (payload) {
     const supabase = await createClient()
-    const { error } = await supabase.auth.verifyOtp({ token_hash: tokenHash, type: 'recovery' })
+    const { error } = payload.kind === 'code'
+      ? await supabase.auth.exchangeCodeForSession(payload.value)
+      : await supabase.auth.verifyOtp({ token_hash: payload.value, type: 'recovery' })
     if (!error) return NextResponse.redirect(new URL('/reset-password', requestUrl.origin))
   }
 

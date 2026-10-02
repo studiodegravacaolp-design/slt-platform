@@ -25,3 +25,7 @@ npm run build
 ```
 
 Somente a chave publicável é usada. Sessões SSR usam cookies, `proxy.ts` renova tokens e as páginas privadas validam com `getClaims()`. Consulte `docs/` para a arquitetura e o contrato do banco.
+
+## Recuperação de senha
+
+O Supabase Auth deve permitir a URL de retorno da aplicação em **Authentication → URL Configuration → Redirect URLs**. Para desenvolvimento local, configure `http://localhost:3000/auth/confirm`. Para produção, configure a origem efetivamente publicada seguida de `/auth/confirm` (por exemplo, `https://<dominio-da-aplicacao>/auth/confirm`). Não use curingas amplos nem URLs de domínios não controlados.
