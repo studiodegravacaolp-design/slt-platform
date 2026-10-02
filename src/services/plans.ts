@@ -1,0 +1,7 @@
+import {createClient}from '@/lib/supabase/server';import{getCurrentOrganizationId}from './organizations';import{planSchema,type PlanInput}from '@/validations/plan';import type{Tables}from '@/types/supabase'
+export type Plan=Tables<'plans'>
+export async function listPlans(){const s=await createClient();const org=await getCurrentOrganizationId();const{data,error}=await s.from('plans').select('*').eq('organization_id',org).order('name');if(error)throw new Error('Não foi possível carregar planos.');return data}
+export async function getPlan(id:number){const s=await createClient();const{data,error}=await s.from('plans').select('*').eq('id',id).single();if(error)throw new Error('Plano não encontrado.');return data}
+export async function createPlan(input:PlanInput){const s=await createClient();const organization_id=await getCurrentOrganizationId();const{data,error}=await s.from('plans').insert({...planSchema.parse(input),organization_id}).select().single();if(error)throw new Error('Não foi possível criar plano.');return data}
+export async function updatePlan(id:number,input:Partial<PlanInput>){const s=await createClient();const{data,error}=await s.from('plans').update(planSchema.partial().parse(input)).eq('id',id).select().single();if(error)throw new Error('Não foi possível atualizar plano.');return data}
+export async function updatePlanStatus(id:number,status:string){return updatePlan(id,{status})}
