@@ -904,6 +904,40 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      bootstrap_organization_owner: {
+        Args: {
+          p_email?: string
+          p_name: string
+          p_phone?: string
+          p_trade_name?: string
+        }
+        Returns: {
+          cep: string | null
+          city: string | null
+          cnpj: string | null
+          complement: string | null
+          created_at: string
+          email: string | null
+          id: number
+          logo: string | null
+          name: string
+          neighborhood: string | null
+          number: string | null
+          phone: string | null
+          state: string | null
+          status: string
+          street: string | null
+          trade_name: string | null
+          updated_at: string
+          website: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "organizations"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       current_user_organization_id: { Args: never; Returns: number }
     }
     Enums: {
