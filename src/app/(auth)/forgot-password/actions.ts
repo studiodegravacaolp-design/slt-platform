@@ -3,16 +3,8 @@
 import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { getConfirmationRedirectUrl } from '@/lib/auth/confirmation-callback'
 import { passwordRecoveryRequestSchema } from '@/validations/password-recovery'
-
-function getRecoveryRedirectUrl(origin: string) {
-  const url = new URL(origin)
-  if (url.protocol !== 'http:' && url.protocol !== 'https:') throw new Error('Invalid origin')
-  url.pathname = '/auth/confirm'
-  url.search = ''
-  url.searchParams.set('next', '/reset-password')
-  return url.toString()
-}
 
 export async function requestPasswordRecovery(formData: FormData) {
   const parsed = passwordRecoveryRequestSchema.safeParse({ email: formData.get('email') })
@@ -20,7 +12,7 @@ export async function requestPasswordRecovery(formData: FormData) {
 
   let redirectTo: string
   try {
-    redirectTo = getRecoveryRedirectUrl((await headers()).get('origin') ?? '')
+    redirectTo = getConfirmationRedirectUrl((await headers()).get('origin') ?? '', 'recovery')
   } catch {
     redirect('/forgot-password?error=request')
   }
