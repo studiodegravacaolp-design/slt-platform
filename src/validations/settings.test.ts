@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { modalitySchema, organizationUpdateSchema, unitSchema } from './settings'
+import { modalitySchema, operationalStatusSchema, organizationUpdateSchema, unitSchema } from './settings'
 
 describe('settings validation', () => {
   it('requires a unit name', () => expect(() => unitSchema.parse({})).toThrow())
@@ -14,5 +14,15 @@ describe('settings validation', () => {
   it('rejects invalid organization contact values', () => {
     expect(() => organizationUpdateSchema.parse({ name: 'SLT', email: 'invalido' })).toThrow()
     expect(() => organizationUpdateSchema.parse({ name: 'SLT', website: 'invalido' })).toThrow()
+  })
+  it('accepts only the canonical operational statuses', () => {
+    expect(operationalStatusSchema.parse('active')).toBe('active')
+    expect(operationalStatusSchema.parse('inactive')).toBe('inactive')
+    expect(() => operationalStatusSchema.parse('archived')).toThrow()
+  })
+  it('uses canonical statuses for units and modalities', () => {
+    expect(unitSchema.parse({ name: 'Matriz', status: 'inactive' }).status).toBe('inactive')
+    expect(modalitySchema.parse({ name: 'Tênis', unit_id: 1, status: 'active' }).status).toBe('active')
+    expect(() => modalitySchema.parse({ name: 'Tênis', unit_id: 1, status: 'pending' })).toThrow()
   })
 })

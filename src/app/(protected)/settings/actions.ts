@@ -2,10 +2,10 @@
 
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
-import { createModality, getModality, updateModality } from '@/services/modalities'
+import { createModality, updateModality, updateModalityStatus } from '@/services/modalities'
 import { updateCurrentOrganization } from '@/services/organizations'
-import { createUnit, getUnit, setUnitAsMain, updateUnit } from '@/services/units'
-import { modalitySchema, organizationUpdateSchema, type ModalityInput, type OrganizationUpdateInput, type UnitInput, unitSchema } from '@/validations/settings'
+import { createUnit, getUnit, setUnitAsMain, updateUnit, updateUnitStatus } from '@/services/units'
+import { modalitySchema, operationalStatusSchema, organizationUpdateSchema, type ModalityInput, type OrganizationUpdateInput, type UnitInput, unitSchema } from '@/validations/settings'
 
 const organizationValues = (formData: FormData) => Object.fromEntries([...formData].map(([key, value]) => [key, value === '' ? null : value]))
 const unitValues = (formData: FormData) => Object.fromEntries(['name', 'code', 'email', 'phone', 'cep', 'state', 'city', 'neighborhood', 'street', 'number', 'complement'].map((key) => [key, formData.get(key) === '' ? null : formData.get(key)]))
@@ -36,15 +36,24 @@ export async function makeUnitMain(id: number) {
   redirect(`/settings/units/${id}?main=1`)
 }
 
+export async function changeUnitStatus(id: number, formData: FormData) {
+  let status: 'active' | 'inactive'
+  try { status = operationalStatusSchema.parse(formData.get('status')) } catch { redirect(`/settings/units/${id}?error=status`) }
+  try { await updateUnitStatus(id, status) } catch (error) {
+    if (error instanceof Error && error.message === 'A unidade principal não pode ser inativada.') redirect(`/settings/units/${id}?error=main-status`)
+    redirect(`/settings/units/${id}?error=status`)
+  }
+  revalidatePath('/settings/units')
+  revalidatePath(`/settings/units/${id}`)
+  redirect(`/settings/units/${id}?status=updated`)
+}
+
 export async function saveModality(id: number | undefined, formData: FormData) {
   const destination = id ? `/settings/modalities/${id}` : '/settings/modalities'
   if (id) {
     let input: Pick<ModalityInput, 'name' | 'description'>
     try { input = modalityUpdateSchema.parse(modalityValues(formData)) } catch { redirect(`${destination}?error=validation`) }
-    try {
-      const current = await getModality(id)
-      await updateModality(id, { name: input.name, description: input.description, status: current.status })
-    } catch { redirect(`${destination}?error=update`) }
+    try { await updateModality(id, input) } catch { redirect(`${destination}?error=update`) }
     revalidatePath('/settings/modalities')
     revalidatePath(`/settings/modalities/${id}`)
     redirect(`/settings/modalities/${id}?updated=1`)
@@ -58,4 +67,13 @@ export async function saveModality(id: number | undefined, formData: FormData) {
   }
   revalidatePath('/settings/modalities')
   redirect('/settings/modalities?created=1')
+}
+
+export async function changeModalityStatus(id: number, formData: FormData) {
+  let status: 'active' | 'inactive'
+  try { status = operationalStatusSchema.parse(formData.get('status')) } catch { redirect(`/settings/modalities/${id}?error=status`) }
+  try { await updateModalityStatus(id, status) } catch { redirect(`/settings/modalities/${id}?error=status`) }
+  revalidatePath('/settings/modalities')
+  revalidatePath(`/settings/modalities/${id}`)
+  redirect(`/settings/modalities/${id}?status=updated`)
 }

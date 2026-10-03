@@ -12,10 +12,10 @@ async function assertStudentSportContext(organizationId: number, input: Pick<Eva
   const supabase = await createClient()
   const [{ data: student, error: studentError }, { data: unit, error: unitError }, { data: modality, error: modalityError }] = await Promise.all([
     supabase.from('students').select('id').eq('id', input.student_id).eq('organization_id', organizationId).single(),
-    supabase.from('units').select('id').eq('id', input.unit_id).eq('organization_id', organizationId).single(),
-    supabase.from('modalities').select('unit_id').eq('id', input.modality_id).single(),
+    supabase.from('units').select('id, status').eq('id', input.unit_id).eq('organization_id', organizationId).single(),
+    supabase.from('modalities').select('unit_id, status').eq('id', input.modality_id).single(),
   ])
-  if (studentError || !student || unitError || !unit || modalityError || !modality || modality.unit_id !== input.unit_id) throw new Error('O contexto de aluno, unidade e modalidade é inválido.')
+  if (studentError || !student || unitError || !unit || modalityError || !modality || modality.unit_id !== input.unit_id || unit.status !== 'active' || modality.status !== 'active') throw new Error('O contexto de aluno, unidade e modalidade é inválido.')
   const { data: link, error: linkError } = await supabase.from('student_modality_units').select('id').eq('student_id', input.student_id).eq('unit_id', input.unit_id).eq('modality_id', input.modality_id).single()
   if (linkError || !link) throw new Error('O aluno não possui o vínculo esportivo selecionado.')
 }

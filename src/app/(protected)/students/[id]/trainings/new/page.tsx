@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { getStudent } from '@/services/students'
-import { listStudentModalityUnits } from '@/services/student-modality-units'
+import { listActiveStudentModalityUnits } from '@/services/student-modality-units'
 import { TrainingCreateSubmitButton } from '@/components/trainings/training-create-submit-button'
 import { createTrainingAction } from '../../../../trainings/actions'
 
@@ -9,7 +9,7 @@ export default async function NewTraining({ params }: { params: Promise<{ id: st
   const id = Number((await params).id)
   let student
   try { student = await getStudent(id) } catch { notFound() }
-  const contexts = await listStudentModalityUnits(id)
+  const contexts = await listActiveStudentModalityUnits(id)
 
   return <>
     <Link href={`/students/${id}`}>← {student.full_name}</Link>

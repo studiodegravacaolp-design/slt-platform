@@ -51,7 +51,7 @@ export async function getOrganizationOverview(): Promise<OrganizationOverview> {
   const today = getOperationalDate()
   const [unitCount, mainUnit, modalityCount, studentCount, attendanceToday, evaluationCount, chargeCount, attendanceRows, evaluationRows] = await Promise.all([
     supabase.from('units').select('*', { count: 'exact', head: true }).eq('organization_id', organization.id),
-    supabase.from('units').select('id, name').eq('organization_id', organization.id).eq('is_main', true).maybeSingle(),
+    supabase.from('units').select('id, name').eq('organization_id', organization.id).eq('is_main', true).eq('status', 'active').maybeSingle(),
     supabase.from('modalities').select('id, units!inner(organization_id)', { count: 'exact', head: true }).eq('units.organization_id', organization.id),
     supabase.from('students').select('*', { count: 'exact', head: true }).eq('organization_id', organization.id),
     supabase.from('attendance').select('*', { count: 'exact', head: true }).eq('organization_id', organization.id).eq('date', today),
