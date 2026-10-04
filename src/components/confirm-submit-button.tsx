@@ -1,6 +1,7 @@
 'use client'
 
 import type { ReactNode } from 'react'
+import { useFormStatus } from 'react-dom'
 
 type ConfirmSubmitButtonProps = Readonly<{
   children: ReactNode
@@ -8,5 +9,6 @@ type ConfirmSubmitButtonProps = Readonly<{
 }>
 
 export function ConfirmSubmitButton({ children, message }: ConfirmSubmitButtonProps) {
-  return <button type="submit" onClick={(event) => { if (!window.confirm(message)) event.preventDefault() }}>{children}</button>
+  const { pending } = useFormStatus()
+  return <button type="submit" disabled={pending} onClick={(event) => { if (!window.confirm(message)) event.preventDefault() }}>{pending ? 'Processando...' : children}</button>
 }

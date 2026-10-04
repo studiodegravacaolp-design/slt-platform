@@ -8,7 +8,7 @@ describe('operational status', () => {
   })
 
   it('rejects inactive contexts for every new operational flow', () => {
-    for (const flow of ['vínculo esportivo', 'treinamento', 'presença', 'avaliação', 'vínculo financeiro']) {
+    for (const flow of ['vínculo esportivo', 'treinamento', 'presença', 'avaliação', 'vínculo financeiro', 'cobrança']) {
       expect(() => assertActiveUnit('inactive'), flow).toThrow('A unidade selecionada está inativa.')
     }
     expect(() => assertActiveModality('inactive')).toThrow('A modalidade selecionada está inativa.')
