@@ -4,10 +4,8 @@ import { headers } from 'next/headers'
 import { createClient } from '@/lib/supabase/server'
 import { getConfirmationRedirectUrl } from '@/lib/auth/confirmation-callback'
 import { buildSignupRequest } from '@/lib/auth/signup'
+import type { SignupFormState } from '@/lib/auth/signup-form-state'
 import { signupSchema } from '@/validations/signup'
-
-export type SignupFormState = { status: 'idle' | 'success' | 'error'; message?: string; fieldErrors?: Record<string, string[]> }
-export const initialSignupFormState: SignupFormState = { status: 'idle' }
 
 function normalizeFormData(formData: FormData) {
   return Object.fromEntries([...formData.entries()].map(([key, value]) => [key, typeof value === 'string' && (key === 'name' || key === 'email') ? value.trim() : value]))

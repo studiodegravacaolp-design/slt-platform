@@ -1,7 +1,8 @@
 'use client'
 
 import { useActionState } from 'react'
-import { initialSignupFormState, signUp } from '@/app/(auth)/signup/actions'
+import { signUp } from '@/app/(auth)/signup/actions'
+import { initialSignupFormState } from '@/lib/auth/signup-form-state'
 
 export function SignupForm() {
   const [state, formAction, pending] = useActionState(signUp, initialSignupFormState)

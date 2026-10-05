@@ -5,10 +5,7 @@ import { revalidatePath } from 'next/cache'
 import { bootstrapCurrentUserOrganization } from '@/services/onboarding'
 import { getAuthenticatedAccessState } from '@/services/users'
 import { organizationOnboardingSchema } from '@/validations/onboarding'
-
-export type OnboardingFormState = { status: 'idle' | 'error'; message?: string; fieldErrors?: Record<string, string[]> }
-
-export const initialOnboardingFormState: OnboardingFormState = { status: 'idle' }
+import type { OnboardingFormState } from '@/lib/onboarding/form-state'
 
 function normalizeFormData(formData: FormData) {
   return Object.fromEntries([...formData.entries()].map(([key, value]) => [key, typeof value === 'string' && value.trim() === '' ? undefined : value]))

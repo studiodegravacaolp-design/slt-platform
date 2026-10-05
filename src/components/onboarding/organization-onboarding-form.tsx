@@ -1,7 +1,8 @@
 'use client'
 
 import { useActionState } from 'react'
-import { createOrganizationOnboardingAction, initialOnboardingFormState } from '@/app/onboarding/actions'
+import { createOrganizationOnboardingAction } from '@/app/onboarding/actions'
+import { initialOnboardingFormState } from '@/lib/onboarding/form-state'
 
 function fieldError(state: typeof initialOnboardingFormState, field: string) {
   return state.fieldErrors?.[field]?.[0]
