@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
+import { ModalityDuplicateError } from '@/domain/modality-name'
 import { createModality, updateModality, updateModalityStatus } from '@/services/modalities'
 import { updateCurrentOrganization } from '@/services/organizations'
 import { createUnit, getUnit, setUnitAsMain, updateUnit, updateUnitStatus } from '@/services/units'
@@ -53,7 +54,10 @@ export async function saveModality(id: number | undefined, formData: FormData) {
   if (id) {
     let input: Pick<ModalityInput, 'name' | 'description'>
     try { input = modalityUpdateSchema.parse(modalityValues(formData)) } catch { redirect(`${destination}?error=validation`) }
-    try { await updateModality(id, input) } catch { redirect(`${destination}?error=update`) }
+    try { await updateModality(id, input) } catch (error) {
+      if (error instanceof ModalityDuplicateError) redirect(`${destination}?error=duplicate-${error.status}`)
+      redirect(`${destination}?error=update`)
+    }
     revalidatePath('/settings/modalities')
     revalidatePath(`/settings/modalities/${id}`)
     redirect(`/settings/modalities/${id}?updated=1`)
@@ -62,6 +66,7 @@ export async function saveModality(id: number | undefined, formData: FormData) {
   let input: ModalityInput
   try { input = modalitySchema.parse(modalityValues(formData)) } catch { redirect(`${destination}?error=validation`) }
   try { await getUnit(input.unit_id); await createModality(input) } catch (error) {
+    if (error instanceof ModalityDuplicateError) redirect(`${destination}?error=duplicate-${error.status}`)
     if (error instanceof Error && error.message === 'Unidade não encontrada.') redirect(`${destination}?error=unit`)
     redirect(`${destination}?error=update`)
   }

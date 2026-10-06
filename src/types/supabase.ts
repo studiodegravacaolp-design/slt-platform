@@ -286,12 +286,14 @@ export type Database = {
           created_at: string
           description: string | null
           id: number
+          name_key: string
           name: string
           status: string
           unit_id: number
           updated_at: string
         }
         Insert: {
+          name_key?: string
           created_at?: string
           description?: string | null
           id?: number
@@ -301,6 +303,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          name_key?: string
           created_at?: string
           description?: string | null
           id?: number
