@@ -9,7 +9,7 @@ import caseMap from './modality-case-map.json'
 // Optional native test runtime, installed OUTSIDE the application's dependencies.
 // No external connection string: these tests can only start a disposable local DB.
 const runtimeEntry = resolve('node_modules/.modality-verification/node_modules/embedded-postgres/dist/index.js')
-const supportsEmbeddedPostgres = process.platform !== 'win32' && existsSync(runtimeEntry)
+const supportsEmbeddedPostgres = existsSync(runtimeEntry)
 const migration = readFileSync(resolve('supabase/migrations/20261005224442_modalities_name_key_uniqueness.sql'), 'utf8')
 const fixture = readFileSync(resolve('supabase/tests/modalities-fixture.sql'), 'utf8')
 type Client = { connect(): Promise<void>; end(): Promise<void>; query(sql: string, values?: unknown[]): Promise<{ rows: Record<string, unknown>[] }> }

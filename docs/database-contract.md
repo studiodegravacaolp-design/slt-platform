@@ -32,7 +32,7 @@ Caracteres cuja capitalização pode expandir não são expandidos. Por exemplo,
 
 A migration é transacional, bloqueia gravações durante a verificação/consolidação e aborta se os IDs 11/12, organização 15/unidade 13, nomes, descrições, status, timestamps ou referências tiverem mudado. Somente o ID 11 pode ser removido; o ID 12 é preservado. Os snapshots são emitidos via NOTICE: preservar o log da execução aprovada. O backfill aciona o trigger existente de `updated_at`, registrando o momento da normalização. Qualquer outra duplicidade exige revisão, sem deduplicação automática.
 
-Os testes nativos usam um cluster PostgreSQL 17 exclusivamente local e a fixture `supabase/tests/modalities-fixture.sql`, que nunca deve ser aplicada no Supabase. O runtime de teste não integra as dependências do app. `embedded-postgres` requer um ambiente Unix compatível, portanto a suíte nativa é marcada como skipped no Windows e deve ser executada em CI/Linux. Para preparar esse ambiente, instalar somente no diretório ignorado e executar a suíte:
+Os testes nativos usam um cluster PostgreSQL 17 exclusivamente local e a fixture `supabase/tests/modalities-fixture.sql`, que nunca deve ser aplicada no Supabase. O runtime de teste não integra as dependências do app. O runtime utilizado possui suporte a Windows x64; PostgreSQL 17.10 foi validado neste desktop. As suítes podem executar quando o runtime estiver disponível. Para preparar esse ambiente, instalar somente no diretório ignorado e executar a suíte:
 
 ```powershell
 npm.cmd install --prefix node_modules/.modality-verification --no-save --package-lock=false embedded-postgres@17.10.0-beta.17

@@ -116,10 +116,12 @@ end;
 $presentation_checks$;
 
 create or replace function private.set_modality_name_v1()
-returns trigger language plpgsql security invoker
+returns trigger language plpgsql security definer
 set search_path = ''
 as $function$
 begin
+  -- Restricted to transforming NEW through qualified pure helpers: no table
+  -- access or dynamic SQL. Caller DML remains subject to the existing RLS.
   new.name := private.modality_display_name_v2(new.name);
   new.name_key := private.modality_name_key_v1(new.name);
   return new;
