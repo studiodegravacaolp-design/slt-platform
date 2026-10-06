@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { canonicalizeModalityName, cleanModalityName, isModalityUniqueViolation, ModalityDuplicateError, modalityDiacritics, modalityWhitespace, normalizeModalityName } from './modality-name'
+import { canonicalizeModalityName, cleanModalityName, isModalityUniqueViolation, lowercaseModalityPresentation, ModalityDuplicateError, modalityDiacritics, modalityWhitespace, normalizeModalityName } from './modality-name'
 import { modalitySchema } from '@/validations/settings'
 
 describe('modality names', () => {
@@ -8,6 +8,37 @@ describe('modality names', () => {
     expect(normalizeModalityName(name)).toBe('natacao')
     expect(canonicalizeModalityName(name)).toBe('Natação')
     expect(modalitySchema.parse({ name, unit_id: 13 }).name).toBe('Natação')
+  })
+  it.each([
+    ['futebol', 'Futebol', 'futebol'],
+    ['Futebol', 'Futebol', 'futebol'],
+    ['FUTEBOL', 'Futebol', 'futebol'],
+    ['  futebol  ', 'Futebol', 'futebol'],
+    ['futebol de campo', 'Futebol de campo', 'futebol de campo'],
+    ['FUTEBOL DE CAMPO', 'Futebol de campo', 'futebol de campo'],
+    ['basquete', 'Basquete', 'basquete'],
+    ['BASQUETE', 'Basquete', 'basquete'],
+    ['voleibol', 'Voleibol', 'voleibol'],
+    ['VOLEIBOL', 'Voleibol', 'voleibol'],
+  ])('formats common name %s without title case', (input, name, key) => {
+    expect(canonicalizeModalityName(input)).toBe(name)
+    expect(normalizeModalityName(canonicalizeModalityName(input))).toBe(key)
+  })
+  it('keeps accents, canonical Unicode and the comparison key invariant', () => {
+    expect(canonicalizeModalityName('ÁGUA')).toBe('Água')
+    expect(canonicalizeModalityName('A\u0301GUA')).toBe('Água')
+    expect(lowercaseModalityPresentation('FÚTBOL')).toBe('fútbol')
+    for (const value of ['FUTEBOL', 'ÁGUA', 'A\u0301GUA', '𐐀SPORT', '  futebol\u00a0de\tcampo  ']) {
+      expect(normalizeModalityName(canonicalizeModalityName(value))).toBe(normalizeModalityName(value))
+    }
+  })
+  it('only capitalizes an initial character when the frozen one-character mapping is safe', () => {
+    expect(canonicalizeModalityName('ßport')).toBe('ẞport')
+    expect(normalizeModalityName('ẞport')).toBe(normalizeModalityName('ßport'))
+    expect(canonicalizeModalityName('ﬀitness')).toBe('ﬀitness')
+    expect(normalizeModalityName('ﬀitness')).toBe(normalizeModalityName(canonicalizeModalityName('ﬀitness')))
+    expect(canonicalizeModalityName('123 esporte')).toBe('123 esporte')
+    expect(canonicalizeModalityName('!futebol')).toBe('!futebol')
   })
   it('collapses every supported whitespace character identically', () => {
     for (const space of modalityWhitespace) {
@@ -20,8 +51,8 @@ describe('modality names', () => {
     expect(normalizeModalityName('ÓLEO')).toBe('oleo')
   })
   it('preserves unknown spelling, punctuation and meaningful word boundaries', () => {
-    expect(canonicalizeModalityName('  Minha\t\tMODALIDADE – X  ')).toBe('Minha MODALIDADE – X')
-    expect(canonicalizeModalityName('constructor')).toBe('constructor')
+    expect(canonicalizeModalityName('  Minha\t\tMODALIDADE – X  ')).toBe('Minha modalidade – x')
+    expect(canonicalizeModalityName('constructor')).toBe('Constructor')
     expect(normalizeModalityName('Nata-ção')).toBe('nata-cao')
     expect(normalizeModalityName('Nata  ção')).toBe('nata cao')
     expect(canonicalizeModalityName('Natacãozinha')).toBe('Natacãozinha')

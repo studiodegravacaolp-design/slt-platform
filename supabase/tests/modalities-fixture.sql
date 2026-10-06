@@ -46,5 +46,6 @@ insert into public.users values('00000000-0000-0000-0000-000000000015',15,'activ
 insert into public.units values(13,15,'active'),(14,15,'active'),(16,16,'active');
 insert into public.modalities(id,unit_id,name,description,status,created_at,updated_at) values
  (11,13,'Natação','Natação','inactive','2026-10-05 18:34:03.343181+00','2026-10-05 18:34:31.010877+00'),
- (12,13,'Natação','Natação','active','2026-10-05 18:34:07.695546+00','2026-10-05 18:34:07.695546+00');
+ (12,13,'Natação','Natação','active','2026-10-05 18:34:07.695546+00','2026-10-05 18:34:07.695546+00'),
+ (13,13,'futebol','Futebol','active','2026-10-06 12:00:00+00','2026-10-06 12:00:00+00');
 select setval(pg_get_serial_sequence('public.modalities','id'),100);

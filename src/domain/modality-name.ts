@@ -7,6 +7,11 @@ const whitespace = new RegExp(`[${modalityWhitespace}]+`, 'gu')
 const diacritics = new RegExp(`[${modalityDiacritics}]`, 'gu')
 const lowercaseCharacters = Array.from(caseMap.lowercase)
 const lowercaseMap = new Map(Array.from(caseMap.uppercase, (letter, index) => [letter, lowercaseCharacters[index]]))
+const uppercaseMap = new Map<string, string>()
+for (const [index, uppercase] of Array.from(caseMap.uppercase).entries()) {
+  const lowercase = lowercaseCharacters[index]
+  if (lowercase && Array.from(lowercase).length === 1 && Array.from(uppercase).length === 1) uppercaseMap.set(lowercase, uppercase)
+}
 const canonicalNames: Readonly<Record<string, string>> = { natacao: 'Natação' }
 
 export function cleanModalityName(name: string): string {
@@ -20,9 +25,36 @@ export function normalizeModalityName(name: string): string {
   return Array.from(decomposed, (letter) => lowercaseMap.get(letter) ?? letter).join('').normalize('NFC')
 }
 
+/** Frozen, locale-independent lowercase mapping for presentation only. */
+export function lowercaseModalityPresentation(name: string): string {
+  return Array.from(cleanModalityName(name), (letter) => lowercaseMap.get(letter) ?? letter).join('').normalize('NFC')
+}
+
+function capitalizeInitialSafely(name: string, key: string): string {
+  const characters = Array.from(name)
+  const first = characters[0]
+  if (!first) return name
+
+  const capitalized = uppercaseMap.get(first)
+  if (!capitalized) return name
+
+  const candidate = `${capitalized}${characters.slice(1).join('')}`.normalize('NFC')
+  // Never use a potentially expanding host case conversion. A one-code-point
+  // mapping is accepted only when the technical identity remains identical.
+  return normalizeModalityName(candidate) === key ? candidate : name
+}
+
 export function canonicalizeModalityName(name: string): string {
   const key = normalizeModalityName(name)
-  return Object.hasOwn(canonicalNames, key) ? canonicalNames[key] : cleanModalityName(name)
+  const canonical = Object.hasOwn(canonicalNames, key)
+    ? canonicalNames[key]
+    : capitalizeInitialSafely(lowercaseModalityPresentation(name), key)
+
+  if (normalizeModalityName(canonical) !== key) {
+    throw new Error('A apresentação da modalidade alteraria sua chave técnica.')
+  }
+
+  return canonical
 }
 
 export const modalityDuplicateMessages = {

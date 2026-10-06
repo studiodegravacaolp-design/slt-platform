@@ -24,9 +24,15 @@ As regras v1 usam NFC para apresentação; colapsam uma lista explícita de espa
 
 O único mapeamento de apresentação é `natacao → Natação`. Nomes desconhecidos preservam a grafia após NFC e limpeza de espaços.
 
+## Modalidades — Correção 03
+
+Além da chave técnica v1, a apresentação é determinística e independente de locale: NFC, limpeza dos espaços v1, lowercase pela mesma tabela Unicode congelada e maiúscula apenas no primeiro caractere quando o mapeamento for seguro, de um caractere para um caractere, e mantiver a mesma `name_key`. Assim, `FUTEBOL DE CAMPO` é apresentado como `Futebol de campo`, sem Title Case. O mapeamento explícito `natacao → Natação` tem precedência.
+
+Caracteres cuja capitalização pode expandir não são expandidos. Por exemplo, `ﬀitness` é preservado; `ßport` usa o mapeamento simples e seguro `ẞport`, pois sua `name_key` continua `ßport`. A trigger de modalidades recalcula tanto `name` quanto `name_key` em INSERT e UPDATE diretos. A migration 03 exige que a infraestrutura da Correção 02 esteja instalada, revalida os IDs auditados 12 e 13, mantém a UNIQUE `(unit_id, name_key)`, e aborta se RLS, policies, grants ou a invariância da chave não puderem ser preservados.
+
 A migration é transacional, bloqueia gravações durante a verificação/consolidação e aborta se os IDs 11/12, organização 15/unidade 13, nomes, descrições, status, timestamps ou referências tiverem mudado. Somente o ID 11 pode ser removido; o ID 12 é preservado. Os snapshots são emitidos via NOTICE: preservar o log da execução aprovada. O backfill aciona o trigger existente de `updated_at`, registrando o momento da normalização. Qualquer outra duplicidade exige revisão, sem deduplicação automática.
 
-Os testes nativos usam um cluster PostgreSQL 17 exclusivamente local e a fixture `supabase/tests/modalities-fixture.sql`, que nunca deve ser aplicada no Supabase. O runtime de teste não integra as dependências do app. Para repetir a validação completa no Windows, instalar somente no diretório ignorado e executar a suíte:
+Os testes nativos usam um cluster PostgreSQL 17 exclusivamente local e a fixture `supabase/tests/modalities-fixture.sql`, que nunca deve ser aplicada no Supabase. O runtime de teste não integra as dependências do app. `embedded-postgres` requer um ambiente Unix compatível, portanto a suíte nativa é marcada como skipped no Windows e deve ser executada em CI/Linux. Para preparar esse ambiente, instalar somente no diretório ignorado e executar a suíte:
 
 ```powershell
 npm.cmd install --prefix node_modules/.modality-verification --no-save --package-lock=false embedded-postgres@17.10.0-beta.17

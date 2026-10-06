@@ -9,6 +9,7 @@ import caseMap from './modality-case-map.json'
 // Optional native test runtime, installed OUTSIDE the application's dependencies.
 // No external connection string: these tests can only start a disposable local DB.
 const runtimeEntry = resolve('node_modules/.modality-verification/node_modules/embedded-postgres/dist/index.js')
+const supportsEmbeddedPostgres = process.platform !== 'win32' && existsSync(runtimeEntry)
 const migration = readFileSync(resolve('supabase/migrations/20261005224442_modalities_name_key_uniqueness.sql'), 'utf8')
 const fixture = readFileSync(resolve('supabase/tests/modalities-fixture.sql'), 'utf8')
 type Client = { connect(): Promise<void>; end(): Promise<void>; query(sql: string, values?: unknown[]): Promise<{ rows: Record<string, unknown>[] }> }
@@ -23,7 +24,7 @@ async function availablePort(): Promise<number> {
   return address.port
 }
 
-describe.runIf(existsSync(runtimeEntry))('modality migration — disposable PostgreSQL 17', () => {
+describe.runIf(supportsEmbeddedPostgres)('modality migration — disposable PostgreSQL 17', () => {
   let cluster: Cluster
   let client: Client
   let database: string
@@ -63,12 +64,15 @@ describe.runIf(existsSync(runtimeEntry))('modality migration — disposable Post
     expect((await client.query("select count(*)::int as total from information_schema.columns where table_schema='public' and table_name='modalities' and column_name='name_key'")).rows[0].total).toBe(0)
     expect((await client.query("select to_regprocedure('private.modality_name_key_v1(text)') as function")).rows[0].function).toBeNull()
   }
-  it('preserves ID 12, removes only 11 and preserves RLS, policies and table grants', async () => {
+  it('preserves IDs 12/13, removes only 11 and preserves RLS, policies and table grants', async () => {
     const security = `select relrowsecurity,relforcerowsecurity,relacl::text from pg_class where oid='public.modalities'::regclass`
     const before = await client.query(security)
     const policies = await client.query("select * from pg_policies where tablename='modalities' order by policyname")
     await client.query(migration)
-    expect((await client.query('select id,name,name_key,status,description from public.modalities')).rows).toEqual([{ id: '12', name: 'Natação', name_key: 'natacao', status: 'active', description: 'Natação' }])
+    expect((await client.query('select id,name,name_key,status,description from public.modalities order by id')).rows).toEqual([
+      { id: '12', name: 'Natação', name_key: 'natacao', status: 'active', description: 'Natação' },
+      { id: '13', name: 'futebol', name_key: 'futebol', status: 'active', description: 'Futebol' },
+    ])
     expect((await client.query(security)).rows).toEqual(before.rows)
     expect((await client.query("select * from pg_policies where tablename='modalities' order by policyname")).rows).toEqual(policies.rows)
     expect((await client.query("select has_function_privilege('authenticated','private.set_modality_name_v1()','execute') as allowed")).rows[0].allowed).toBe(false)
