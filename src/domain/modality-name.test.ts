@@ -4,6 +4,7 @@ import { modalitySchema } from '@/validations/settings'
 
 describe('modality names', () => {
   it.each(['natacao', 'Natacao', 'NATACAO', 'natação', 'Natação', 'NATAÇÃO', ' natacao ', 'Natac\u0327a\u0303o'])('canonicalizes %s explicitly', (name) => {
+    expect({ name: canonicalizeModalityName(name), name_key: normalizeModalityName(name) }).toEqual({ name: 'Natação', name_key: 'natacao' })
     expect(normalizeModalityName(name)).toBe('natacao')
     expect(canonicalizeModalityName(name)).toBe('Natação')
     expect(modalitySchema.parse({ name, unit_id: 13 }).name).toBe('Natação')

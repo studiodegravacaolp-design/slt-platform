@@ -37,6 +37,19 @@ describe('modality writes', () => {
     expect(mocks.eq).toHaveBeenCalledWith('name_key', 'natacao')
     expect(mocks.getActiveUnit).toHaveBeenCalledWith(13)
   })
+  it.each(['natacao', 'Natacao', 'NATACAO', 'natação', 'Natação', 'NATAÇÃO'])('creates %s with the official name and technical key kept separate', async (name) => {
+    const result = await createModality({ name, unit_id: 13 })
+    expect(mocks.insert).toHaveBeenCalledWith({ name: 'Natação', unit_id: 13 })
+    expect(mocks.eq).toHaveBeenCalledWith('name_key', 'natacao')
+    expect(result).toMatchObject({ name: 'Natação', name_key: 'natacao' })
+  })
+  it.each(['natacao', 'Natacao', 'NATACAO', 'natação', 'Natação', 'NATAÇÃO'])('edits %s with the official name and technical key kept separate', async (name) => {
+    mocks.single.mockResolvedValueOnce({ data: { ...record, name: 'Outra', name_key: 'outra' }, error: null }).mockResolvedValueOnce({ data: record, error: null })
+    const result = await updateModality(12, { name })
+    expect(mocks.update).toHaveBeenCalledWith({ name: 'Natação' })
+    expect(mocks.eq).toHaveBeenCalledWith('name_key', 'natacao')
+    expect(result).toMatchObject({ name: 'Natação', name_key: 'natacao' })
+  })
   it.each(['active', 'inactive'] as const)('rejects an existing %s modality without inserting', async (status) => {
     mocks.maybeSingle.mockResolvedValue({ data: { id: 11, status }, error: null })
     await expect(createModality({ name: 'natacao', unit_id: 13 })).rejects.toEqual(new ModalityDuplicateError(status))

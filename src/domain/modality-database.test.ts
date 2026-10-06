@@ -97,6 +97,19 @@ describe.runIf(existsSync(runtimeEntry))('modality migration — disposable Post
     await expect(client.query("update public.modalities set name='NATACAO' where id=$1", [other.rows[0].id])).rejects.toMatchObject({ code: '23505' })
     await expect(client.query("insert into public.modalities(unit_id,name) values(13,'   ')")).rejects.toMatchObject({ code: '23514' })
   })
+  it.each(['natacao', 'Natacao', 'NATACAO', 'natação', 'Natação', 'NATAÇÃO'])('direct INSERT and UPDATE of %s both persist Natação / natacao', async (name) => {
+    await client.query(migration)
+    await authenticated(client)
+    // Exercise the actual trigger as authenticated, in a disposable LOCAL DB.
+    const inserted = await client.query('insert into public.modalities(unit_id,name,name_key) values(14,$1,$2) returning id,name,name_key', [name, 'forged'])
+    expect(inserted.rows[0]).toMatchObject({ name: 'Natação', name_key: 'natacao' })
+    const id = inserted.rows[0].id
+    await client.query("update public.modalities set name='Outra' where id=$1", [id])
+    const updated = await client.query('update public.modalities set name=$1,name_key=$2 where id=$3 returning name,name_key', [name, 'forged', id])
+    expect(updated.rows[0]).toEqual({ name: 'Natação', name_key: 'natacao' })
+    const unique = await client.query("select pg_get_constraintdef(oid) as definition from pg_constraint where conrelid='public.modalities'::regclass and conname='modalities_unit_name_key_key'")
+    expect(unique.rows[0].definition).toBe('UNIQUE (unit_id, name_key)')
+  })
   it('preserves tenant isolation for reads, writes and reassignment with authenticated RLS', async () => {
     await client.query(migration)
     await authenticated(client, 16)
