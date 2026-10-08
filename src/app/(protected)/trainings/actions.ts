@@ -2,7 +2,6 @@
 
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
-import { operationFailure, operationSuccess, type OperationalActionResult } from '@/lib/operational-result'
 import {
   createTraining,
   createTrainingExercise,
@@ -13,9 +12,13 @@ import {
   updateTrainingStatus,
 } from '@/services/trainings'
 
-const data = (formData: FormData) => Object.fromEntries([...formData].map(([key, value]) => [key, value === '' ? undefined : value]))
+type TrainingActionResult = { status: 'success' | 'error'; message: string }
 
-function trainingActionFailure(error: unknown): OperationalActionResult {
+const data = (formData: FormData) => Object.fromEntries([...formData].map(([key, value]) => [key, value === '' ? undefined : value]))
+const operationSuccess = (message: string): TrainingActionResult => ({ status: 'success', message })
+const operationFailure = (message: string): TrainingActionResult => ({ status: 'error', message })
+
+function trainingActionFailure(error: unknown): TrainingActionResult {
   if (error instanceof Error && [
     'A data de término não pode ser anterior à data de início.',
     'O vínculo esportivo selecionado não está ativo ou não pertence ao aluno.',
@@ -29,7 +32,7 @@ function trainingActionFailure(error: unknown): OperationalActionResult {
   return operationFailure('Revise os campos informados e tente novamente.')
 }
 
-export async function createTrainingAction(studentId: number, formData: FormData): Promise<OperationalActionResult> {
+export async function createTrainingAction(studentId: number, formData: FormData): Promise<TrainingActionResult> {
   let training
   try {
     training = await createTraining(studentId, data(formData))
@@ -39,7 +42,7 @@ export async function createTrainingAction(studentId: number, formData: FormData
   redirect(`/trainings/${training.id}`)
 }
 
-export async function saveTrainingAction(id: number, formData: FormData): Promise<OperationalActionResult> {
+export async function saveTrainingAction(id: number, formData: FormData): Promise<TrainingActionResult> {
   try {
     await updateTraining(id, data(formData))
   } catch (error) {
@@ -48,7 +51,7 @@ export async function saveTrainingAction(id: number, formData: FormData): Promis
   redirect(`/trainings/${id}`)
 }
 
-export async function statusTrainingAction(id: number, formData: FormData): Promise<OperationalActionResult> {
+export async function statusTrainingAction(id: number, formData: FormData): Promise<TrainingActionResult> {
   try {
     await updateTrainingStatus(id, formData.get('status'))
   } catch (error) {
@@ -58,7 +61,7 @@ export async function statusTrainingAction(id: number, formData: FormData): Prom
   return operationSuccess('Status atualizado com sucesso.')
 }
 
-export async function addExerciseAction(id: number, formData: FormData): Promise<OperationalActionResult> {
+export async function addExerciseAction(id: number, formData: FormData): Promise<TrainingActionResult> {
   try {
     await createTrainingExercise(id, data(formData))
   } catch (error) {
@@ -68,7 +71,7 @@ export async function addExerciseAction(id: number, formData: FormData): Promise
   return operationSuccess('Exercício adicionado com sucesso.')
 }
 
-export async function updateExerciseAction(trainingId: number, exerciseId: number, formData: FormData): Promise<OperationalActionResult> {
+export async function updateExerciseAction(trainingId: number, exerciseId: number, formData: FormData): Promise<TrainingActionResult> {
   try {
     await updateTrainingExercise(trainingId, exerciseId, data(formData))
   } catch (error) {
@@ -78,7 +81,7 @@ export async function updateExerciseAction(trainingId: number, exerciseId: numbe
   return operationSuccess('Exercício atualizado com sucesso.')
 }
 
-export async function removeExerciseAction(id: number, formData: FormData): Promise<OperationalActionResult> {
+export async function removeExerciseAction(id: number, formData: FormData): Promise<TrainingActionResult> {
   try {
     await deleteTrainingExercise(id, Number(formData.get('exercise_id')))
   } catch (error) {
@@ -88,7 +91,7 @@ export async function removeExerciseAction(id: number, formData: FormData): Prom
   return operationSuccess('Exercício removido com sucesso.')
 }
 
-export async function orderExercisesAction(id: number, formData: FormData): Promise<OperationalActionResult> {
+export async function orderExercisesAction(id: number, formData: FormData): Promise<TrainingActionResult> {
   try {
     await reorderTrainingExercises(id, String(formData.get('ids')).split(',').map(Number))
   } catch (error) {
