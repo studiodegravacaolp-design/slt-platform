@@ -90,10 +90,13 @@ export type Database = {
       }
       charges: {
         Row: {
+          charge_type: string
+          competence_month: string | null
           created_at: string
           description: string | null
           due_date: string
           id: number
+          idempotency_key: string
           issue_date: string
           observation: string | null
           organization_id: number
@@ -105,10 +108,13 @@ export type Database = {
           value: number
         }
         Insert: {
+          charge_type: string
+          competence_month?: string | null
           created_at?: string
           description?: string | null
           due_date: string
           id?: number
+          idempotency_key?: string
           issue_date: string
           observation?: string | null
           organization_id: number
@@ -120,10 +126,13 @@ export type Database = {
           value: number
         }
         Update: {
+          charge_type?: string
+          competence_month?: string | null
           created_at?: string
           description?: string | null
           due_date?: string
           id?: number
+          idempotency_key?: string
           issue_date?: string
           observation?: string | null
           organization_id?: number
@@ -391,6 +400,7 @@ export type Database = {
           charge_id: number
           created_at: string
           id: number
+          idempotency_key: string
           observation: string | null
           payment_date: string
           payment_method: string
@@ -401,6 +411,7 @@ export type Database = {
           charge_id: number
           created_at?: string
           id?: number
+          idempotency_key: string
           observation?: string | null
           payment_date: string
           payment_method: string
@@ -411,6 +422,7 @@ export type Database = {
           charge_id?: number
           created_at?: string
           id?: number
+          idempotency_key?: string
           observation?: string | null
           payment_date?: string
           payment_method?: string
@@ -907,6 +919,37 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      cancel_financial_charge: {
+        Args: { p_charge_id: number }
+        Returns: Database["public"]["Tables"]["charges"]["Row"]
+      }
+      create_financial_charge: {
+        Args: {
+          p_charge_type: string
+          p_competence_month: string | null
+          p_description: string | null
+          p_due_date: string
+          p_idempotency_key: string
+          p_issue_date: string
+          p_observation?: string | null
+          p_student_id: number
+          p_student_plan_id: number
+          p_unit_id: number
+          p_value: number
+        }
+        Returns: Database["public"]["Tables"]["charges"]["Row"]
+      }
+      record_financial_payment: {
+        Args: {
+          p_amount_paid: number
+          p_charge_id: number
+          p_idempotency_key: string
+          p_observation: string | null
+          p_payment_date: string
+          p_payment_method: string
+        }
+        Returns: Database["public"]["Tables"]["payments"]["Row"]
+      }
       bootstrap_organization_owner: {
         Args: {
           p_email?: string
