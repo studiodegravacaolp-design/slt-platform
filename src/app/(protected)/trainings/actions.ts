@@ -1,10 +1,99 @@
 'use server'
-import { redirect } from 'next/navigation'; import { revalidatePath } from 'next/cache'; import { createTraining, updateTraining, updateTrainingStatus, createTrainingExercise, updateTrainingExercise, deleteTrainingExercise, reorderTrainingExercises } from '@/services/trainings'
-const data=(f:FormData)=>Object.fromEntries([...f].map(([k,v])=>[k,v===''?undefined:v]))
-export async function createTrainingAction(studentId:number,f:FormData){const t=await createTraining(studentId,data(f));redirect(`/trainings/${t.id}`)}
-export async function saveTrainingAction(id:number,f:FormData){await updateTraining(id,data(f));redirect(`/trainings/${id}`)}
-export async function statusTrainingAction(id:number,f:FormData){await updateTrainingStatus(id,String(f.get('status')));revalidatePath(`/trainings/${id}`)}
-export async function addExerciseAction(id:number,f:FormData){await createTrainingExercise(id,data(f));revalidatePath(`/trainings/${id}`)}
-export async function updateExerciseAction(trainingId:number,exerciseId:number,f:FormData){await updateTrainingExercise(exerciseId,data(f));revalidatePath(`/trainings/${trainingId}`)}
-export async function removeExerciseAction(id:number,f:FormData){await deleteTrainingExercise(Number(f.get('exercise_id')));revalidatePath(`/trainings/${id}`)}
-export async function orderExercisesAction(id:number,f:FormData){await reorderTrainingExercises(id,String(f.get('ids')).split(',').map(Number));revalidatePath(`/trainings/${id}`)}
+
+import { revalidatePath } from 'next/cache'
+import { redirect } from 'next/navigation'
+import { operationFailure, operationSuccess, type OperationalActionResult } from '@/lib/operational-result'
+import {
+  createTraining,
+  createTrainingExercise,
+  deleteTrainingExercise,
+  reorderTrainingExercises,
+  updateTraining,
+  updateTrainingExercise,
+  updateTrainingStatus,
+} from '@/services/trainings'
+
+const data = (formData: FormData) => Object.fromEntries([...formData].map(([key, value]) => [key, value === '' ? undefined : value]))
+
+function trainingActionFailure(error: unknown): OperationalActionResult {
+  if (error instanceof Error && [
+    'A data de término não pode ser anterior à data de início.',
+    'O vínculo esportivo selecionado não está ativo ou não pertence ao aluno.',
+    'Contexto esportivo inválido.',
+    'Exercício não pertence ao treinamento informado.',
+    'A ordem dos exercícios é inválida.',
+    'A ordem dos exercícios deve conter cada exercício uma única vez.',
+    'A ordem contém exercícios de outro treinamento.',
+  ].includes(error.message)) return operationFailure(error.message)
+
+  return operationFailure('Revise os campos informados e tente novamente.')
+}
+
+export async function createTrainingAction(studentId: number, formData: FormData): Promise<OperationalActionResult> {
+  let training
+  try {
+    training = await createTraining(studentId, data(formData))
+  } catch (error) {
+    return trainingActionFailure(error)
+  }
+  redirect(`/trainings/${training.id}`)
+}
+
+export async function saveTrainingAction(id: number, formData: FormData): Promise<OperationalActionResult> {
+  try {
+    await updateTraining(id, data(formData))
+  } catch (error) {
+    return trainingActionFailure(error)
+  }
+  redirect(`/trainings/${id}`)
+}
+
+export async function statusTrainingAction(id: number, formData: FormData): Promise<OperationalActionResult> {
+  try {
+    await updateTrainingStatus(id, formData.get('status'))
+  } catch (error) {
+    return trainingActionFailure(error)
+  }
+  revalidatePath(`/trainings/${id}`)
+  return operationSuccess('Status atualizado com sucesso.')
+}
+
+export async function addExerciseAction(id: number, formData: FormData): Promise<OperationalActionResult> {
+  try {
+    await createTrainingExercise(id, data(formData))
+  } catch (error) {
+    return trainingActionFailure(error)
+  }
+  revalidatePath(`/trainings/${id}`)
+  return operationSuccess('Exercício adicionado com sucesso.')
+}
+
+export async function updateExerciseAction(trainingId: number, exerciseId: number, formData: FormData): Promise<OperationalActionResult> {
+  try {
+    await updateTrainingExercise(trainingId, exerciseId, data(formData))
+  } catch (error) {
+    return trainingActionFailure(error)
+  }
+  revalidatePath(`/trainings/${trainingId}`)
+  return operationSuccess('Exercício atualizado com sucesso.')
+}
+
+export async function removeExerciseAction(id: number, formData: FormData): Promise<OperationalActionResult> {
+  try {
+    await deleteTrainingExercise(id, Number(formData.get('exercise_id')))
+  } catch (error) {
+    return trainingActionFailure(error)
+  }
+  revalidatePath(`/trainings/${id}`)
+  return operationSuccess('Exercício removido com sucesso.')
+}
+
+export async function orderExercisesAction(id: number, formData: FormData): Promise<OperationalActionResult> {
+  try {
+    await reorderTrainingExercises(id, String(formData.get('ids')).split(',').map(Number))
+  } catch (error) {
+    return trainingActionFailure(error)
+  }
+  revalidatePath(`/trainings/${id}`)
+  return operationSuccess('Ordem atualizada com sucesso.')
+}
