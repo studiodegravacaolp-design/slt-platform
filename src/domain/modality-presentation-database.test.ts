@@ -6,7 +6,7 @@ import { createServer } from 'node:net'
 import { canonicalizeModalityName, normalizeModalityName } from './modality-name'
 
 const runtimeEntry = resolve('node_modules/.modality-verification/node_modules/embedded-postgres/dist/index.js')
-const supportsEmbeddedPostgres = process.platform !== 'win32' && existsSync(runtimeEntry)
+const supportsEmbeddedPostgres = existsSync(runtimeEntry)
 const correction02 = readFileSync(resolve('supabase/migrations/20261005224442_modalities_name_key_uniqueness.sql'), 'utf8')
 const correction03 = readFileSync(resolve('supabase/migrations/20261006122715_modality_visual_name_presentation.sql'), 'utf8')
 const fixture = readFileSync(resolve('supabase/tests/modalities-fixture.sql'), 'utf8')
@@ -66,6 +66,19 @@ describe.runIf(supportsEmbeddedPostgres)('modality presentation migration — di
     ])
     expect((await client.query("select relrowsecurity,relforcerowsecurity,relacl::text from pg_class where oid='public.modalities'::regclass")).rows).toEqual(security.rows)
     expect((await client.query("select jsonb_agg(to_jsonb(p) order by policyname) as policies from pg_policies p where schemaname='public' and tablename='modalities'")).rows).toEqual(policies.rows)
+    const functions = await client.query("select p.proname, p.prosecdef, p.proconfig, pg_catalog.pg_get_userbyid(p.proowner) as owner from pg_catalog.pg_proc p join pg_catalog.pg_namespace n on n.oid=p.pronamespace where n.nspname='private' and p.proname in ('set_modality_name_v1','modality_display_name_v2','clean_modality_name_v1','modality_name_key_v1')")
+    expect(functions.rows).toHaveLength(4)
+    for (const fn of functions.rows) {
+      expect(fn.owner).toBe('postgres')
+      expect(fn.proconfig).toEqual(['search_path=""'])
+      expect(fn.prosecdef).toBe(fn.proname === 'set_modality_name_v1')
+    }
+    for (const role of ['authenticated', 'anon']) {
+      for (const signature of ['private.modality_display_name_v2(text)', 'private.set_modality_name_v1()']) {
+        const privileges = await client.query('select pg_catalog.has_function_privilege($1,$2,\'EXECUTE\') as allowed', [role, signature])
+        expect(privileges.rows[0].allowed).toBe(false)
+      }
+    }
   })
 
   it.each([
@@ -84,13 +97,24 @@ describe.runIf(supportsEmbeddedPostgres)('modality presentation migration — di
 
   it('uses the updated trigger for direct INSERT and UPDATE and ignores forged keys', async () => {
     await client.query(correction03)
+    const foreign = await client.query("insert into public.modalities(unit_id,name) values(16,'FUTEBOL') returning id")
     await authenticated(client)
+    await expect(client.query("select private.modality_display_name_v2('FUTEBOL')")).rejects.toMatchObject({ code: '42501' })
     const inserted = await client.query("insert into public.modalities(unit_id,name,name_key) values(14,'FUTEBOL DE CAMPO','forged') returning id,name,name_key")
     expect(inserted.rows[0]).toMatchObject({ name: 'Futebol de campo', name_key: 'futebol de campo' })
     const updated = await client.query("update public.modalities set name='NATACAO',name_key='forged' where id=$1 returning name,name_key", [inserted.rows[0].id])
     expect(updated.rows[0]).toEqual({ name: 'Natação', name_key: 'natacao' })
-    await client.query("insert into public.modalities(unit_id,name) values(16,'FUTEBOL')")
+    await expect(client.query("insert into public.modalities(unit_id,name) values(16,'FUTEBOL')")).rejects.toMatchObject({ code: '42501' })
+    await expect(client.query('update public.modalities set unit_id=16 where id=$1', [inserted.rows[0].id])).rejects.toMatchObject({ code: '42501' })
+    expect((await client.query('select id from public.modalities where id=$1', [foreign.rows[0].id])).rows).toEqual([])
+    expect((await client.query("update public.modalities set name='OUTRO' where id=$1 returning id", [foreign.rows[0].id])).rows).toEqual([])
     await expect(client.query("insert into public.modalities(unit_id,name) values(13,'futebol')")).rejects.toMatchObject({ code: '23505', constraint: 'modalities_unit_name_key_key' })
+    const anonPrivileges = await client.query("select pg_catalog.has_table_privilege('anon','public.modalities','SELECT') as read, pg_catalog.has_table_privilege('anon','public.modalities','INSERT') as create, pg_catalog.has_table_privilege('anon','public.modalities','UPDATE') as change, pg_catalog.has_table_privilege('anon','public.modalities','DELETE') as remove")
+    expect(anonPrivileges.rows[0]).toEqual({ read: false, create: false, change: false, remove: false })
+    await client.query('reset role; set role anon')
+    await expect(client.query("select private.modality_display_name_v2('FUTEBOL')")).rejects.toMatchObject({ code: '42501' })
+    await expect(client.query('select id from public.modalities')).rejects.toMatchObject({ code: '42501' })
+    await expect(client.query("insert into public.modalities(unit_id,name) values(14,'FUTEBOL')")).rejects.toMatchObject({ code: '42501' })
   })
 
   it('rolls back when the approved modality 13 precondition is no longer safe', async () => {
