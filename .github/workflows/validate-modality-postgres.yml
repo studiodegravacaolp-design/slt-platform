@@ -1,0 +1,44 @@
+name: Validate modality PostgreSQL
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - validation/modality-postgres-03
+
+permissions:
+  contents: read
+
+jobs:
+  modality-postgres:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install isolated PostgreSQL runtime
+        run: |
+          npm install \
+            --prefix node_modules/.modality-verification \
+            --no-save \
+            --package-lock=false \
+            embedded-postgres@17.10.0-beta.17
+
+      - name: Run modality PostgreSQL tests
+        run: |
+          node node_modules/vitest/vitest.mjs run \
+            src/domain/modality-database.test.ts \
+            src/domain/modality-presentation-database.test.ts
