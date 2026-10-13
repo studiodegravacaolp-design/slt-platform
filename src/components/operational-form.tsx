@@ -2,9 +2,10 @@
 
 import { useActionState, type ReactNode } from 'react'
 import { useFormStatus } from 'react-dom'
+import type { OperationalActionResult } from '@/lib/operational-result'
 
 type FormState = { message?: string; status: 'idle' | 'success' | 'error' }
-type FormAction = (formData: FormData) => Promise<void>
+type FormAction = (formData: FormData) => Promise<void | OperationalActionResult>
 
 const initialState: FormState = { status: 'idle' }
 
@@ -16,7 +17,8 @@ export function OperationalForm({ action, children, className, successMessage }:
 }>) {
   const [state, formAction] = useActionState(async (_previousState: FormState, formData: FormData): Promise<FormState> => {
     try {
-      await action(formData)
+      const result = await action(formData)
+      if (result) return result
       return { status: 'success', message: successMessage }
     } catch {
       return { status: 'error', message: 'Não foi possível concluir a operação. Tente novamente.' }
