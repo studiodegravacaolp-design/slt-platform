@@ -1,0 +1,7 @@
+.section { margin-bottom: 18px; }
+.heading { align-items: center; display: flex; flex-wrap: wrap; gap: 16px; justify-content: space-between; margin-bottom: 18px; }
+.heading h2 { font-size: 20px; margin: 0 0 5px; }
+.heading p { color: var(--muted); font-size: 13px; margin: 0; }
+.form { margin-top: 16px; }
+
+@media (max-width: 640px) { .heading { align-items: stretch; flex-direction: column; } .heading button { align-self: flex-start; } }

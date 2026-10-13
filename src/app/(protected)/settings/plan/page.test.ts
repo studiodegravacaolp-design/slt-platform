@@ -4,7 +4,7 @@ import { currentSltPlan } from './page'
 
 describe('SLT current plan settings', () => {
   it('provides a settings link to the current SLT plan', () => {
-    expect(settingsSections).toContainEqual({ label: 'Plano', href: '/settings/plan' })
+    expect(settingsSections).toContainEqual(expect.objectContaining({ label: 'Plano', href: '/settings/plan' }))
   })
 
   it('represents the current SLT plan as Free without using student financial plans', () => {

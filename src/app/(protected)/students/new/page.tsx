@@ -1,4 +1,6 @@
 import Link from 'next/link'
+import { PageHeader } from '@/components/page-header'
 import { StudentForm } from '@/components/students/student-form'
 import { createStudentAction } from '../actions'
-export default function NewStudentPage() { return <><header className="subpage-header"><div><Link href="/students">← Alunos</Link><h1>Novo aluno</h1><p>Cadastre os dados essenciais do aluno.</p></div></header><StudentForm action={createStudentAction} /></> }
+import styles from '../students.module.css'
+export default function NewStudentPage() { return <div className={styles.formPage}><PageHeader title="Novo aluno" description="Cadastre os dados pessoais, de contato e esportivos." eyebrow="SLT Free · Gestão de alunos" action={<Link className="button" href="/students">← Alunos</Link>} /><StudentForm action={createStudentAction} /></div> }

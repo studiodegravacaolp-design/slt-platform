@@ -1,0 +1,77 @@
+.page { max-width: 1180px; }
+.backLink { color: var(--brand); display: inline-flex; font-size: 14px; font-weight: 700; margin: 0 0 16px; }
+.backLink:hover { text-decoration: underline; }
+.headerActions { align-items: center; display: flex; flex-wrap: wrap; gap: 10px; }
+.sectionHeader { align-items: flex-start; display: flex; gap: 16px; justify-content: space-between; margin: 0 0 16px; }
+.sectionHeader h2 { font-size: 20px; margin: 0 0 5px; }
+.sectionHeader p { color: var(--muted); font-size: 14px; margin: 0; }
+.tablePanel { overflow-x: auto; padding: 0; }
+.table { border-collapse: collapse; min-width: 850px; text-align: left; width: 100%; }
+.tableCaption { height: 1px; margin: -1px; overflow: hidden; padding: 0; position: absolute; width: 1px; clip: rect(0, 0, 0, 0); white-space: nowrap; }
+.table th { background: #f8fafc; color: var(--muted); font-size: 11px; letter-spacing: .06em; padding: 14px 18px; text-transform: uppercase; }
+.table td { border-top: 1px solid var(--line); font-size: 14px; padding: 15px 18px; vertical-align: middle; }
+.trainingName { color: var(--ink); display: block; font-weight: 700; }
+.trainingDescription, .contextDetail { color: var(--muted); display: block; font-size: 13px; margin-top: 3px; overflow-wrap: anywhere; }
+.action { color: var(--brand); font-size: 13px; font-weight: 700; white-space: nowrap; }
+.action:hover { text-decoration: underline; }
+.status { border-radius: 999px; display: inline-block; font-size: 11px; font-weight: 700; padding: 5px 9px; }
+.active { background: #e6f6ef; color: #166d4d; }
+.inactive { background: #edf0f4; color: #64748b; }
+.empty { color: var(--muted); margin: 0; }
+.empty a { color: var(--brand); font-weight: 700; }
+
+.trainingForm { display: grid; gap: 16px; max-width: 1060px; }
+.formCard { background: var(--surface); border: 1px solid var(--line); border-radius: 15px; padding: 22px; }
+.formCard h2 { font-size: 18px; margin: 0 0 6px; }
+.formCard > p { color: var(--muted); font-size: 13px; margin: 0 0 18px; }
+.formGrid { display: grid; gap: 15px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.formGrid label, .exerciseEdit label { color: #44576c; display: grid; font-size: 12px; font-weight: 700; gap: 6px; }
+.formGrid input, .formGrid textarea, .formGrid select, .exerciseEdit input, .exerciseEdit textarea, .exerciseEdit select, .statusForm select { background: #fff; border: 1px solid #d7e0e8; border-radius: 8px; font: inherit; min-width: 0; padding: 11px 12px; width: 100%; }
+.formGrid textarea, .exerciseEdit textarea { min-height: 104px; resize: vertical; }
+.formGrid input:focus, .formGrid textarea:focus, .formGrid select:focus, .exerciseEdit input:focus, .exerciseEdit textarea:focus, .exerciseEdit select:focus, .statusForm select:focus { outline: 2px solid #96d1ce; outline-offset: 1px; }
+.wide { grid-column: 1 / -1; }
+.formActions { display: flex; justify-content: flex-end; }
+
+.detailGrid { display: grid; gap: 20px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.detailCard { padding: 24px; }
+.detailCard h2, .exercisesPanel h2 { font-size: 20px; margin: 0 0 18px; }
+.dataGrid { display: grid; gap: 18px; grid-template-columns: repeat(2, minmax(0, 1fr)); margin: 0; }
+.dataGrid div { min-width: 0; }
+.dataGrid dt { color: var(--muted); font-size: 12px; margin-bottom: 5px; }
+.dataGrid dd { font-size: 15px; font-weight: 600; margin: 0; overflow-wrap: anywhere; }
+.statusPanel { display: grid; gap: 16px; margin-top: 20px; padding: 24px; }
+.statusSummary { align-items: center; display: flex; flex-wrap: wrap; gap: 8px; margin: 0; }
+.statusForm { align-items: end; display: flex; flex-wrap: wrap; gap: 12px; }
+.statusForm label { display: grid; font-size: 12px; font-weight: 700; gap: 6px; min-width: 190px; }
+.exercisesPanel { margin-top: 20px; padding: 24px; }
+.exerciseList { display: grid; gap: 14px; list-style: none; margin: 0; padding: 0; }
+.exerciseCard { border: 1px solid var(--line); border-radius: 12px; padding: 18px; }
+.exerciseHeader { align-items: flex-start; display: flex; gap: 14px; justify-content: space-between; }
+.exerciseHeader h3 { font-size: 17px; margin: 0; }
+.exerciseOrder { color: var(--muted); font-size: 12px; font-weight: 700; margin: 0 0 4px; text-transform: uppercase; }
+.exerciseDetails { border: 0; margin-top: 16px; }
+.exerciseDetails summary { color: var(--brand); cursor: pointer; font-size: 13px; font-weight: 700; }
+.exerciseDetails summary:focus-visible { outline: 2px solid #96d1ce; outline-offset: 3px; }
+.exerciseMeta { display: grid; gap: 12px; grid-template-columns: repeat(4, minmax(0, 1fr)); margin: 16px 0 0; }
+.exerciseMeta div { min-width: 0; }
+.exerciseMeta dt { color: var(--muted); font-size: 12px; margin-bottom: 4px; }
+.exerciseMeta dd { font-size: 14px; font-weight: 600; margin: 0; overflow-wrap: anywhere; }
+.exerciseActions { align-items: center; display: flex; flex-wrap: wrap; gap: 8px; }
+.exerciseActions form { display: contents; }
+.exerciseActions button { padding: 8px 10px; }
+.dangerAction { background: #fff1f2; color: #b4233d; }
+.exerciseEdit { border-top: 1px solid var(--line); display: grid; gap: 15px; margin-top: 16px; padding-top: 16px; }
+.exerciseEditGrid { display: grid; gap: 12px; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.addExercise { margin-top: 20px; }
+
+@media (max-width: 900px) { .detailGrid { grid-template-columns: 1fr; } .exerciseMeta { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 640px) {
+  .sectionHeader, .exerciseHeader { align-items: stretch; flex-direction: column; }
+  .formGrid, .dataGrid, .exerciseMeta, .exerciseEditGrid { grid-template-columns: 1fr; }
+  .statusForm { align-items: stretch; flex-direction: column; }
+  .statusForm label { min-width: 0; }
+  .formActions { justify-content: stretch; }
+  .formActions button { width: 100%; }
+  .exerciseActions { align-items: stretch; flex-direction: column; }
+  .exerciseActions button { width: 100%; }
+}

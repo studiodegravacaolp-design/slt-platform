@@ -1,0 +1,35 @@
+.page { max-width: 1180px; }
+.tablePanel { overflow-x: auto; padding: 0; }
+.table { border-collapse: collapse; min-width: 760px; text-align: left; width: 100%; }
+.table th { background: #f8fafc; color: var(--muted); font-size: 11px; letter-spacing: .06em; padding: 14px 18px; text-transform: uppercase; }
+.table td { border-top: 1px solid var(--line); font-size: 14px; padding: 15px 18px; vertical-align: middle; }
+.table td strong { color: var(--ink); }
+.table td a:not(.action) { color: var(--ink); display: block; font-weight: 700; }
+.table td a:not(.action):hover { color: var(--brand); }
+.description { color: var(--muted); max-width: 340px; }
+.action { color: var(--brand); font-size: 13px; font-weight: 700; white-space: nowrap; }
+.status { border-radius: 999px; display: inline-block; font-size: 11px; font-weight: 700; padding: 5px 9px; }
+.active { background: #e6f6ef; color: #166d4d; }
+.inactive { background: #edf0f4; color: #64748b; }
+.feedback { margin: 16px 0; }
+.createCard { background: var(--surface); border: 1px solid var(--line); border-radius: 15px; padding: 22px; }
+.createCard h2, .detailCard h2, .statusPanel h2 { font-size: 18px; margin: 0 0 7px; }
+.cardDescription { color: var(--muted); font-size: 13px; margin: 0 0 18px; }
+.formGrid { display: grid; gap: 15px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.formGrid label, .statusForm label { color: #44576c; display: grid; font-size: 12px; font-weight: 700; gap: 6px; }
+.formGrid input, .formGrid textarea, .statusForm select { background: #fff; border: 1px solid #d7e0e8; border-radius: 8px; font: inherit; min-width: 0; padding: 11px 12px; width: 100%; }
+.formGrid textarea { min-height: 96px; resize: vertical; }
+.formGrid input:focus, .formGrid textarea:focus, .statusForm select:focus { outline: 2px solid #96d1ce; outline-offset: 1px; }
+.wide { grid-column: span 2; }
+.detailForm { display: grid; gap: 16px; max-width: 1000px; }
+.detailCard { display: grid; gap: 14px; }
+.unitValue { background: #f8fafc; border: 1px solid var(--line); border-radius: 10px; margin: 0; padding: 13px; }
+.unitValue strong { color: var(--ink); display: block; }
+.unitValue span { color: var(--muted); display: block; font-size: 13px; margin-top: 4px; }
+.statusPanel { display: grid; gap: 16px; max-width: 1000px; }
+.statusSummary { align-items: center; display: flex; flex-wrap: wrap; gap: 8px; margin: 0; }
+.statusForm { align-items: end; display: flex; flex-wrap: wrap; gap: 12px; }
+.statusForm label { min-width: 190px; }
+.backButton { white-space: nowrap; }
+
+@media (max-width: 640px) { .formGrid { grid-template-columns: 1fr; } .wide { grid-column: auto; } .statusForm { align-items: stretch; flex-direction: column; } .statusForm label { min-width: 0; } }

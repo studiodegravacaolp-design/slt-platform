@@ -1,0 +1,73 @@
+.page { max-width: 1180px; }
+
+.entryCards { display: grid; gap: 18px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.entryCard { background: var(--surface); border: 1px solid var(--line); border-radius: 15px; display: grid; gap: 10px; min-height: 190px; padding: 24px; transition: border-color .15s ease, box-shadow .15s ease, transform .15s ease; }
+.entryCard:hover { border-color: #8bc9c5; box-shadow: 0 7px 20px #142b4912; transform: translateY(-1px); }
+.entryIcon { align-items: center; background: var(--soft); border-radius: 10px; color: var(--brand); display: inline-flex; font-size: 19px; height: 38px; justify-content: center; width: 38px; }
+.entryCard h2 { color: var(--ink); font-size: 20px; margin: 4px 0 0; }
+.entryCard p { color: var(--muted); font-size: 14px; margin: 0; }
+.entryLink { color: var(--brand); font-size: 14px; font-weight: 700; margin-top: auto; }
+
+.backLink { color: var(--brand); display: inline-flex; font-size: 14px; font-weight: 700; margin: 0 0 16px; }
+.backLink:hover, .action:hover { text-decoration: underline; }
+.sectionHeader { align-items: flex-start; display: flex; gap: 16px; justify-content: space-between; margin: 0 0 16px; }
+.sectionHeader h2 { font-size: 20px; margin: 0 0 5px; }
+.sectionHeader p { color: var(--muted); font-size: 14px; margin: 0; }
+
+.tablePanel { overflow-x: auto; padding: 0; }
+.table { border-collapse: collapse; min-width: 780px; text-align: left; width: 100%; }
+.table caption { height: 1px; margin: -1px; overflow: hidden; padding: 0; position: absolute; width: 1px; clip: rect(0, 0, 0, 0); white-space: nowrap; }
+.table th { background: #f8fafc; color: var(--muted); font-size: 11px; letter-spacing: .06em; padding: 14px 18px; text-transform: uppercase; }
+.table td { border-top: 1px solid var(--line); font-size: 14px; padding: 15px 18px; vertical-align: middle; }
+.primaryValue { color: var(--ink); display: block; font-weight: 700; }
+.secondaryValue { color: var(--muted); display: block; font-size: 13px; margin-top: 3px; overflow-wrap: anywhere; }
+.action { color: var(--brand); font-size: 13px; font-weight: 700; white-space: nowrap; }
+.status { background: #eef3f7; border-radius: 999px; color: #526678; display: inline-block; font-size: 11px; font-weight: 700; padding: 5px 9px; white-space: nowrap; }
+.money { font-variant-numeric: tabular-nums; font-weight: 700; white-space: nowrap; }
+
+.disclosure { background: var(--surface); border: 1px solid var(--line); border-radius: 15px; margin-top: 20px; overflow: hidden; }
+.disclosure > summary { align-items: center; color: var(--brand); cursor: pointer; display: flex; font-size: 14px; font-weight: 700; gap: 8px; list-style: none; padding: 17px 20px; }
+.disclosure > summary::-webkit-details-marker { display: none; }
+.disclosure > summary::before { content: '+'; font-size: 19px; line-height: 1; }
+.disclosure[open] > summary { border-bottom: 1px solid var(--line); }
+.disclosure[open] > summary::before { content: '−'; }
+.disclosure > summary:focus-visible { outline: 3px solid #96d1ce; outline-offset: -3px; }
+.form { display: grid; gap: 16px; padding: 20px; }
+.formGrid { display: grid; gap: 15px; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.formGrid label { color: #44576c; display: grid; font-size: 12px; font-weight: 700; gap: 6px; }
+.formGrid input, .formGrid textarea, .formGrid select, .filterGrid input, .filterGrid select, .inlineForm input { background: #fff; border: 1px solid #d7e0e8; border-radius: 8px; font: inherit; min-width: 0; padding: 11px 12px; width: 100%; }
+.formGrid textarea { min-height: 105px; resize: vertical; }
+.formGrid input:focus, .formGrid textarea:focus, .formGrid select:focus, .filterGrid input:focus, .filterGrid select:focus, .inlineForm input:focus { outline: 2px solid #96d1ce; outline-offset: 1px; }
+.wide { grid-column: 1 / -1; }
+.formActions { display: flex; justify-content: flex-end; }
+
+.filters { margin-bottom: 20px; }
+.filterGrid { align-items: end; display: grid; gap: 12px; grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.filterGrid label { color: #44576c; display: grid; font-size: 12px; font-weight: 700; gap: 6px; }
+.filterActions { display: flex; gap: 10px; }
+.secondaryButton { background: #fff; border: 1px solid #cbd8e3; color: var(--ink); }
+.secondaryButton:hover { background: #f8fafc; }
+
+.detailGrid { display: grid; gap: 18px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.detailCard { padding: 24px; }
+.detailCard h2 { font-size: 19px; margin: 0 0 18px; }
+.dataGrid { display: grid; gap: 17px; grid-template-columns: repeat(2, minmax(0, 1fr)); margin: 0; }
+.dataGrid div { min-width: 0; }
+.dataGrid dt { color: var(--muted); font-size: 12px; margin-bottom: 5px; }
+.dataGrid dd { font-size: 15px; font-weight: 600; margin: 0; overflow-wrap: anywhere; }
+.paymentsPanel { margin-top: 20px; }
+.paymentsPanel h2 { font-size: 19px; margin: 0 0 16px; }
+.paymentsTable { border-top: 1px solid var(--line); list-style: none; margin: 0; padding: 0; }
+.paymentsTable li { align-items: center; border-bottom: 1px solid var(--line); display: grid; gap: 10px; grid-template-columns: 1.2fr 1fr 1fr 2fr; padding: 14px 0; }
+.paymentsTable strong, .paymentsTable span { display: block; }
+.paymentsTable span { color: var(--muted); font-size: 13px; }
+.paymentsEmpty { color: var(--muted); margin: 0; }
+.inlineDisclosure { border: 0; margin-top: 12px; }
+.inlineDisclosure > summary { color: var(--brand); cursor: pointer; font-size: 13px; font-weight: 700; }
+.inlineForm { align-items: end; display: grid; gap: 10px; grid-template-columns: 1fr 1fr auto; margin-top: 12px; }
+.inlineForm label { color: #44576c; display: grid; font-size: 12px; font-weight: 700; gap: 5px; }
+.inlineForm button { align-self: end; }
+.note { color: var(--muted); font-size: 13px; margin: 16px 0 0; }
+
+@media (max-width: 980px) { .formGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .filterGrid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 680px) { .entryCards, .detailGrid, .formGrid, .dataGrid, .filterGrid { grid-template-columns: 1fr; } .wide { grid-column: auto; } .sectionHeader { flex-direction: column; } .filterActions { flex-wrap: wrap; } .paymentsTable li { grid-template-columns: 1fr 1fr; } .inlineForm { grid-template-columns: 1fr; } .formActions { justify-content: stretch; } .formActions button { width: 100%; } }
