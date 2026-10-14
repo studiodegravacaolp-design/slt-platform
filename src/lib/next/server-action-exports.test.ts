@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest'
 const serverActionFiles = [
   '../../app/(auth)/signup/actions.ts',
   '../../app/onboarding/actions.ts',
+  '../../app/(protected)/financial/actions.ts',
 ]
 
 describe('server action module exports', () => {
