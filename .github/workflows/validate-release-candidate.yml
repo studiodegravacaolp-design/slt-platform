@@ -45,7 +45,13 @@ jobs:
             embedded-postgres@17.10.0-beta.17
 
       - name: Run complete test suite
-        run: npm test
+        run: |
+          node node_modules/vitest/vitest.mjs run \
+            --no-file-parallelism \
+            --hookTimeout=60000 \
+            --reporter=json \
+            --outputFile=full-test-results.json
+          node --input-type=module -e "import result from './full-test-results.json' with { type: 'json' }; const summary = { total: result.numTotalTests, passed: result.numPassedTests, failed: result.numFailedTests, skipped: result.numPendingTests }; console.log('Full test summary:', JSON.stringify(summary)); if (summary.failed !== 0 || summary.skipped !== 0) { throw new Error('The complete suite must have no failures or skips: ' + JSON.stringify(summary)); }"
 
       - name: Verify modality PostgreSQL tests executed
         run: |
