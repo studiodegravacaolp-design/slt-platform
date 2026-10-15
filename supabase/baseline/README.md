@@ -78,9 +78,12 @@ deve ser incluído em um dump de aplicação.
 
 1. Provisionar um projeto Supabase novo, sem importar dados de produção.
 2. Aplicar a estrutura base extraída do catálogo em ambiente descartável.
-3. Aplicar, uma única vez e nesta ordem, as migrations de bootstrap e
-   Modalidades listadas acima. Não alterar o baseline para incluir parcialmente
-   objetos dessas migrations.
+3. Aplicar, uma única vez e nesta ordem, a migration de bootstrap,
+   `003_public_bootstrap_rpc.sql` e então as migrations de Modalidades listadas
+   acima. O suplemento representa a migration histórica
+   `20261002164707_add_public_organization_bootstrap_rpc`, confirmada no
+   catálogo canônico mas ausente deste repositório. Não alterar o baseline para
+   incluir parcialmente objetos dessas migrations.
 4. Validar RLS, grants e funções usando usuários sintéticos.
 5. Somente depois aplicar `financial_integrity_expand`; publicar uma aplicação
    compatível; validar; e então considerar `financial_integrity_harden`.

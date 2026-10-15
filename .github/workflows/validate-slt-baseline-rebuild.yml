@@ -1,0 +1,57 @@
+name: Validate SLT baseline rebuild
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - validation/slt-baseline-rebuild-13b3
+
+permissions:
+  contents: read
+
+jobs:
+  baseline-rebuild:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: https://ci-validation.invalid
+      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ci-validation-key
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Setup Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+
+      - name: Install locked dependencies
+        run: npm ci
+
+      - name: Install isolated PostgreSQL 17 runtime
+        run: |
+          npm install \
+            --prefix node_modules/.modality-verification \
+            --no-save \
+            --package-lock=false \
+            embedded-postgres@17.10.0-beta.17
+
+      - name: Rebuild sanitized baseline and validate finance phases
+        run: |
+          node node_modules/vitest/vitest.mjs run src/domain/baseline-rebuild-database.test.ts
+
+      - name: Validate modality PostgreSQL migrations
+        run: |
+          node node_modules/vitest/vitest.mjs run \
+            src/domain/modality-database.test.ts \
+            src/domain/modality-presentation-database.test.ts
+
+      - name: Validate financial PostgreSQL migrations
+        run: node node_modules/vitest/vitest.mjs run src/domain/financial-database.test.ts
+
+      - name: Validate whitespace
+        run: git diff --check HEAD^..HEAD
