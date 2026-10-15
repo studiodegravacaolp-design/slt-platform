@@ -40,7 +40,8 @@ const platformMock = `
     if not exists (select 1 from pg_roles where rolname = 'anon') then create role anon nologin; end if;
     if not exists (select 1 from pg_roles where rolname = 'service_role') then create role service_role nologin; end if;
   end $$;
-  create extension if not exists pgcrypto;
+  create schema extensions;
+  create extension if not exists pgcrypto with schema extensions;
 `
 
 const migrationPrerequisites = `
