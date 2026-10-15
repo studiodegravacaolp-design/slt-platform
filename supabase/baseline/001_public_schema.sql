@@ -28,8 +28,7 @@ create table public.modalities (
   unit_id bigint not null references public.units(id) on delete restrict,
   name text not null, description text,
   status text not null default 'active' check (status in ('active', 'inactive')),
-  created_at timestamptz not null default now(), updated_at timestamptz not null default now(),
-  name_key text not null check (name_key <> ''), unique (unit_id, name_key)
+  created_at timestamptz not null default now(), updated_at timestamptz not null default now()
 );
 
 create table public.students (

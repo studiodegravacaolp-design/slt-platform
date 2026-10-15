@@ -10,7 +10,10 @@ deve ser reconstruída em um novo projeto Supabase e preserva a referência a
 
 ## Corte do baseline
 
-O catálogo canônico confirmou as migrations abaixo, já incorporadas ao corte:
+O catálogo canônico confirmou as migrations abaixo. O baseline local foi
+normalizado para o ponto imediatamente anterior às três últimas migrations de
+bootstrap/Modalidades, para que seus scripts versionados possam ser aplicados
+uma única vez e sem duplicar `name_key` ou triggers.
 
 - `20260917170059_create_slt_free_v1_schema`
 - `20260917170257_add_slt_rls_and_integrity`
@@ -25,9 +28,13 @@ O catálogo canônico confirmou as migrations abaixo, já incorporadas ao corte:
 - `20261002173949_fix_authenticated_rls_organization_context`
 - `20261002175334_grant_authenticated_public_organization_context_rpc`
 - `20261002220012_harden_authenticated_table_grants`
-- `20261003221622_bootstrap_owner_profile_name`
-- `20261006005504_modalities_name_key_uniqueness`
-- `20261006202519_modality_visual_name_presentation`
+
+As seguintes migrations são posteriores ao baseline local e obrigatórias para
+reconstituir o corte canônico atual:
+
+- `20261003194135_bootstrap_owner_profile_name.sql`
+- `20261005224442_modalities_name_key_uniqueness.sql`
+- `20261006122715_modality_visual_name_presentation.sql`
 
 As migrations locais abaixo **não** estavam presentes no catálogo no momento
 da auditoria e devem continuar posteriores ao baseline:
@@ -72,8 +79,8 @@ deve ser incluído em um dump de aplicação.
 1. Provisionar um projeto Supabase novo, sem importar dados de produção.
 2. Aplicar a estrutura base extraída do catálogo em ambiente descartável.
 3. Aplicar, uma única vez e nesta ordem, as migrations de bootstrap e
-   Modalidades que já compõem o corte, se o baseline escolhido for anterior a
-   elas. Não reaplicá-las sobre um baseline que já as contenha.
+   Modalidades listadas acima. Não alterar o baseline para incluir parcialmente
+   objetos dessas migrations.
 4. Validar RLS, grants e funções usando usuários sintéticos.
 5. Somente depois aplicar `financial_integrity_expand`; publicar uma aplicação
    compatível; validar; e então considerar `financial_integrity_harden`.
