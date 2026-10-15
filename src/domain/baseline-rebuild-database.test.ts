@@ -58,7 +58,7 @@ const migrationPrerequisites = `
   insert into public.modalities (id, unit_id, name, description, status, created_at, updated_at) values
     (11, 13, 'Natação', 'Natação', 'inactive', '2026-10-05 18:34:03.343181+00', '2026-10-05 18:34:31.010877+00'),
     (12, 13, 'Natação', 'Natação', 'active', '2026-10-05 18:34:07.695546+00', '2026-10-05 18:34:07.695546+00'),
-    (13, 14, 'Futebol', 'Futebol', 'active', now(), now());
+    (13, 13, 'futebol', 'Futebol', 'active', now(), now());
   insert into public.students (id, organization_id, full_name, birth_date) values
     (15, 15, 'Synthetic Student A', '2000-01-01'), (16, 16, 'Synthetic Student B', '2000-01-01');
   insert into public.plans (id, organization_id, name, value, periodicity) values
